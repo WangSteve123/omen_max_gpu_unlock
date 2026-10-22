@@ -8,8 +8,8 @@
 ## 快速开始
 
 ```bash
-git clone https://github.com/WangSteve123/omen-power.git ~/omen-power
-cd ~/omen-power
+git clone https://github.com/WangSteve123/omen_max_gpu_unlock.git ~/omen_max_gpu_unlock
+cd ~/omen_max_gpu_unlock
 sudo ./install.sh --with-fan     # 装到 /usr/local/sbin，并启用风扇曲线
 status                            # 一键巡检
 ```
