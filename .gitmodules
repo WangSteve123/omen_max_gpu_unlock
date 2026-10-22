@@ -1,0 +1,3 @@
+[submodule "external/5080-Unlock_Linux"]
+	path = external/5080-Unlock_Linux
+	url = https://github.com/IzzieBoopers/5080-Unlock_Linux.git

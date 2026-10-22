@@ -11,10 +11,13 @@
 #  * boot_mode=enable 只写 WMI 0x22（CTGP/DTGP=1），不碰热档位 0x1a。
 set -u
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # 内核模块 .ko 的位置：可用 OMEN_KO 覆盖，否则在常见路径里找
 KO="${OMEN_KO:-}"
 if [ -z "$KO" ]; then
     for c in \
+        "$SCRIPT_DIR/external/5080-Unlock_Linux/omen_wmi_boost/omen_wmi_boost.ko" \
         "$HOME/5080-Unlock_Linux/omen_wmi_boost/omen_wmi_boost.ko" \
         "/usr/src/omen_wmi_boost/omen_wmi_boost.ko" \
         "./omen_wmi_boost.ko"; do

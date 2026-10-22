@@ -1,15 +1,16 @@
 # OMEN MAX 16（主板 8D41）Linux 调校工具
 
 > 适用：HP OMEN MAX Gaming Laptop 16-ah0xxx（主板 8D41，BIOS F.23），Ubuntu 24.04 / 内核 7.0.0-38-generic。
-> 本仓库是**用户态工具集**：风扇温度曲线、CPU RAPL 功耗墙调节、GPU TGP 解锁验证与最小化持久化。真正执行 175 W 解锁的内核模块来自第三方 GPL 项目 [5080-Unlock_Linux](https://github.com/IzzieBoopers/5080-Unlock_Linux)，**不包含**在本仓库中。
+> 本仓库是**用户态工具集**：风扇温度曲线、CPU RAPL 功耗墙调节、GPU TGP 解锁验证与最小化持久化。真正执行 175 W 解锁的内核模块来自第三方 GPL 项目 [5080-Unlock_Linux](https://github.com/IzzieBoopers/5080-Unlock_Linux)，以 **git submodule** 形式挂在 `external/5080-Unlock_Linux`（不含其代码副本，保持 GPL 独立分发）。
 >
 > **English**: userspace toolkit for HP OMEN MAX 16-ah0xxx (board 8D41) on Linux — fan curve via hp-wmi PWM, CPU RAPL limits, NVIDIA TGP unlock verification, and minimal boot persistence for the third-party `omen_wmi_boost` kernel module.
 
 ## 快速开始
 
 ```bash
-git clone https://github.com/WangSteve123/omen_max_gpu_unlock.git ~/omen_max_gpu_unlock
+git clone --recursive https://github.com/WangSteve123/omen_max_gpu_unlock.git ~/omen_max_gpu_unlock
 cd ~/omen_max_gpu_unlock
+# 已 clone 过但没带 --recursive：git submodule update --init --recursive
 sudo ./install.sh --with-fan     # 装到 /usr/local/sbin，并启用风扇曲线
 status                            # 一键巡检
 ```
@@ -58,7 +59,7 @@ status                            # 一键巡检
 | `/usr/share/dbus-1/system.d/nvidia-powerd.conf` | 自建 D-Bus 策略，**必须 644** |
 | `/etc/systemd/system/omen-fan-curve.service` | 风扇温度曲线 |
 
-> ⚠️ 内核升级后 `extra/` 里的模块不会自动重建：需要重新 `make -C ~/5080-Unlock_Linux/omen_wmi_boost` 再 `sudo ~/omen-power/persist.sh install`。
+> ⚠️ 内核升级后 `extra/` 里的模块不会自动重建：需要重新 `make -C ~/omen_max_gpu_unlock/external/5080-Unlock_Linux/omen_wmi_boost` 再 `sudo ./persist.sh install`（脚本会自动在 submodule 目录找 `.ko`）。
 
 ---
 
@@ -100,15 +101,15 @@ sudo apt install -y git build-essential dkms "linux-headers-$(uname -r)"
 ### 2.2 获取并人工检查脚本
 
 ```bash
-git clone https://github.com/IzzieBoopers/5080-Unlock_Linux.git ~/5080-Unlock_Linux
-cd ~/5080-Unlock_Linux
+cd ~/omen_max_gpu_unlock/external/5080-Unlock_Linux   # submodule
+# 若未初始化：git -C ~/omen_max_gpu_unlock submodule update --init --recursive
 less install.sh          # 至少确认没有奇怪的 curl | sh、没有删系统文件
 ```
 
 ### 2.3 安装（Ubuntu 是 GCC 内核，不要加 LLVM=1）
 
 ```bash
-cd ~/5080-Unlock_Linux
+cd ~/omen_max_gpu_unlock/external/5080-Unlock_Linux
 sudo ./install.sh --force-unsupported
 ```
 
@@ -156,7 +157,7 @@ watch -n1 'nvidia-smi --query-gpu=power.draw,power.limit,temperature.gpu,clocks.
 
 ```bash
 sudo modprobe -r omen_wmi_boost
-cd ~/5080-Unlock_Linux && sudo ./uninstall.sh    # 若存在
+cd ~/omen_max_gpu_unlock/external/5080-Unlock_Linux && sudo ./install.sh --uninstall
 sudo systemctl disable --now nvidia-powerd
 sudo rm -f /etc/modules-load.d/omen_wmi_boost.conf /etc/modprobe.d/omen_wmi_boost.conf
 reboot
