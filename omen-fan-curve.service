@@ -1,0 +1,14 @@
+[Unit]
+Description=OMEN fan temperature curve (hp-wmi pwm)
+After=multi-user.target
+# 仅适用于带 hp-wmi hwmon 的 HP 笔记本；找不到设备时会立即退出
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/omen-fan-curve daemon
+ExecStop=/usr/local/sbin/omen-fan-curve auto
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
